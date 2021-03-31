@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>主页</title>
+    <div th:replace="common_cssjs"></div>
+    <script th:src="@{/js/bootstrap3-typeahead.js}" type="text/javascript"></script>
+    <script th:inline="javascript">
+        $(function () {
+            $("#fund-code").typeahead({
+                minLength: 0,//键入字数多少开始查询补全
+                showHintOnFocus: "true",//将显示所有匹配项
+                fitToElement: true,//选项框宽度与输入框一致
+                items: 8,//下拉数量
+                delay: 500,//延迟时间
+                source: function (query, process) {
+                    $.ajax({
+                        url: '/fundInfo/search',
+                        data: {
+                            fundCode: query
+                        },
+                        type: 'post',
+                        dataType: "json",
+                        success: function (data) {
+                            var res = [];
+                            $.each(data.entity, function (i, item) {
+                                var aItem = item.code + "-" + item.name + '-(' + item.type + ')';//把后台传回来的数据处理成带name形式
+                                res.push(aItem);
+                            })
+                            return process(res);
+                        }
+                    });
+                },
+                afterSelect: function (item) {//item对象
+                    console.log("选择项之后的事件 ，item是当前选中的。"+item);
+
+                    $('#fund-code').attr('value', item);//把id值放到value属性里
+                    console.log($('#fund-code').val())
+                },
+                updater: function (item) {//item是对象,选中后默认返回displayText的值,对于需要的id和name没有,所以手动赋值吧
+                    $('#fund-code').attr('value', item);//把id值放到value属性里
+                    console.log($('#fund-code').val())
+                    return item;//下拉框显示重写为name覆盖默认的displayText
+                },
+
+            });
+            $(".refresh").click(function(){
+                toastr.options = {
+                    closeButton: false, //是否显示关闭按钮
+                    debug: false, //是否使用debug模式
+                    progressBar: false,
+                    positionClass: "toast-top-full-width", //弹出窗的位置
+                    onclick: null,
+                    showDuration: "1000", //显示的动画时间
+                    hideDuration: "1000", //消失的动画时间
+                    timeOut: "200000", //展现时间
+                    extendedTimeOut: "1000", //加长展示时间
+                    showEasing: "swing", //显示时的动画缓冲方式
+                    hideEasing: "linear", //消失时的动画缓冲方式
+                    showMethod: "fadeIn", //显示时的动画方式
+                    hideMethod: "fadeOut" //消失时的动画方式
+                };
+                toastr.warning("基金评论拉取中，请您耐心等待....")
+                $.ajax({
+                    url: '/postInfo/refresh',
+                    type: 'post',
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.code === "0"){
+                            toastr.clear()
+                            toastr.success("基金评论拉取成功");
+                            setTimeout(function(){toastr.clear();},3000);
+                        }
+
+                    }
+                });
+
+            });
+
+        })
+    </script>
+    <style>
+        /*.item:after {
+            content:"";
+            display:block;
+            position:absolute;
+            top:0;
+            bottom:0;
+            left:0;
+            right:0;
+            background:rgba(0,0,0,0.6);
+        }*/
+    </style>
+</head>
+<body>
+
+<div th:replace="common/header::nav"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-2 col-md-offset-8">
+            <!--            th:action="@{/fundInfo/add}" th:method="POST"-->
+            <form class="form-inline" th:action="@{/fundInfo/add}" method="POST">
+                <div class="form-group" style="width: 80%;">
+                    <label class="sr-only">基金代码</label>
+                    <input type="text" id="fund-code" class="form-control input-lg typeahead" autocomplete="off"
+                           placeholder="基金" name="fundInfoStr" data-provide="typeahead" style="width: 100%;" value="">
+                </div>
+                <button type="submit" id="submit-btn" class="btn btn-lg btn-default">添加</button>
+            </form>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 2%;margin-bottom: 2%">
+        <div class="col-md-offset-5">
+            <button class="btn btn-primary btn-lg refresh" role="button">手动同步任务</button>
+        </div>
+    </div>
+    <div class="row" id="content">
+        <h2 class="col-md-offset-3 text-danger" th:text="${error}"></h2>
+        <h2 class="col-md-offset-3 text-success" th:text="${success}"></h2>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>名称</th>
+                <th>代码</th>
+                <th>评论同步状态</th>
+                <th>操作</th>
+                <th>查看</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="fund:${list}">
+                <td th:text="${fund.fundName}"></td>
+                <td th:text="${fund.fundCode}"></td>
+                <td th:switch="${fund.status}">
+                    <p th:case="1" >同步中</p>
+                    <p th:case="0" >未同步</p>
+                </td>
+                <td th:switch="${fund.status}">
+                    <a th:case="1" class="btn btn-danger btn-sm" th:href="@{'/fundInfo/changeStatus?fundCode='+${fund.fundCode}}" role="button">关闭</a>
+                    <a th:case="0" class="btn btn-success btn-sm" th:href="@{'/fundInfo/changeStatus?fundCode='+${fund.fundCode}}" role="button">开启</a>
+                </td>
+                <td>
+                    <a class="btn btn-info btn-sm" th:href="@{'/postInfo/get?fundCode='+${fund.fundCode}}" role="button">查看</a>
+                    <a class="btn btn-warning btn-sm" th:href="@{'/fundInfo/remove?fundCode='+${fund.fundCode}}" role="button">删除</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!--<div th:replace="common/footer::copy"></div>-->
+</body>
+</html>

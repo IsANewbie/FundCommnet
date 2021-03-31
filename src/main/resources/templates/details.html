@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="common_cssjs"></div>
+    <style>
+        /*.item:after {
+            content:"";
+            display:block;
+            position:absolute;
+            top:0;
+            bottom:0;
+            left:0;
+            right:0;
+            background:rgba(0,0,0,0.6);
+        }*/
+    </style>
+</head>
+<body>
+
+<div th:replace="common/header::nav"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="jumbotron">
+            <h1 th:text="${fund.fundName}"></h1>
+            <p th:text="${fund.fundCode}"> </p>
+            <p ></p>
+        </div>
+    </div>
+    <div class="row" id="content">
+<!--        <h2 class="text-danger" th:text="${error}"></h2>-->
+        <div class="alert" role="alert" th:each="post,postStat :${page.records}" th:classappend="${postStat.index % 2 == 0} ? 'alert-info' : 'alert-success'">
+           <h4 th:text="${post.post}"> </h4>
+           <strong><small><p class="pull-right" th:text="${post.writerName}+'——'+${#temporals.format(post.publishTime, 'yyyy-MM-dd HH:mm')}"></p></small></strong>
+        </div>
+
+        <div class="modal-footer no-margin-top">
+            <ul class="pagination pull-right no-margin">
+
+                <!-- 首页 -->
+                <li>
+                    <a th:href="'/postInfo/get?current=1'+ '&fundCode=' +${fund.fundCode}">首页</a>
+                </li>
+
+                <!-- 上一页 -->
+                <li th:if="${page.current -1 > 0}">
+                    <a th:href="'/postInfo/get?current=' + ${page.current - 1}+ '&fundCode=' +${fund.fundCode}" th:text="上一页"></a>
+                </li>
+
+                <!-- 中间页 -->
+                <li th:each="dayCyc : ${#numbers.sequence(1,page.pages)}">
+                    <a th:href="'/postInfo/get?current=' + ${dayCyc} + '&fundCode=' +${fund.fundCode} " th:text="${dayCyc}" th:if="${dayCyc ne page.current}"></a>
+                    <a th:href="'/postInfo/get?current=' + ${dayCyc} + '&fundCode=' +${fund.fundCode} " th:text="${dayCyc}" th:if="${dayCyc eq page.current}" th:style="'font-weight:bold;background: #6faed9;'"></a>
+                </li>
+
+                <!-- 下一页 -->
+                <li th:if="${page.current < page.pages}">
+                    <a th:href="'/postInfo/get?current=' + ${page.current + 1}+ '&fundCode=' +${fund.fundCode} " th:text="下一页"></a>
+                </li>
+
+                <!-- 尾页 -->
+                <li>
+                    <a th:href="'/postInfo/get?current=' + ${page.pages}+ '&fundCode=' +${fund.fundCode} ">尾页</a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+<!--<div th:replace="common/footer::copy"></div>-->
+</body>
+</html>
