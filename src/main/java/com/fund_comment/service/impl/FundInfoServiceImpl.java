@@ -51,6 +51,7 @@ public class FundInfoServiceImpl extends ServiceImpl<FundInfoMapper, FundInfo> i
     public FundInfo getByFundCode(String fundCode) {
         QueryWrapper<FundInfo> query = new QueryWrapper<>();
         query.eq("fund_code", fundCode);
+        query.last("limit 1");
         return getOne(query);
     }
 }

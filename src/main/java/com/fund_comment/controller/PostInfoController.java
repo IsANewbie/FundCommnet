@@ -32,62 +32,6 @@ public class PostInfoController {
     @Autowired
     private FundInfoService fundInfoService;
 
-
-    /**
-     * 获取PostInfo列表
-     */
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ResponseBody
-    @ApiOperation(value = "获取PostInfo列表", notes = "获取PostInfo列表")
-    public Object list(String condition) {
-        List<PostInfo> list = postInfoService.list(null);
-        return JsonUtil.createPageObject(list);
-    }
-
-    /**
-     * 新增PostInfo
-     */
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @ResponseBody
-    @ApiOperation(value = "新增PostInfo", notes = "新增PostInfo")
-    public Object add(PostInfo postInfo) {
-        postInfoService.save(postInfo);
-        return JsonUtil.createOkJson();
-    }
-
-    /**
-     * 删除PostInfo
-     */
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    @ResponseBody
-    @ApiOperation(value = "删除PostInfo", notes = "删除PostInfo")
-    public Object delete(@RequestParam Integer postInfoId) {
-        postInfoService.removeById(postInfoId);
-        return JsonUtil.createOkJson();
-    }
-
-    /**
-     * 修改PostInfo
-     */
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    @ResponseBody
-    @ApiOperation(value = "修改PostInfo", notes = "修改PostInfo")
-    public Object update(PostInfo postInfo) {
-        postInfoService.updateById(postInfo);
-        return JsonUtil.createOkJson();
-    }
-
-    /**
-     * PostInfo详情
-     */
-    @RequestMapping(value = "/detail/{postInfoId}", method = RequestMethod.GET)
-    @ResponseBody
-    @ApiOperation(value = "PostInfo详情", notes = "PostInfo详情")
-    public Object detail(@PathVariable("postInfoId") Integer postInfoId) {
-        PostInfo obj = postInfoService.getById(postInfoId);
-        return JsonUtil.createOkObject(obj);
-    }
-
     /**
      * PostInfo详情
      */
@@ -100,18 +44,6 @@ public class PostInfoController {
         IPage<PostInfo> page = postInfoService.getPage(fundCode, size, current);
         model.addAttribute("page", page);
         return "details";
-    }
-
-    /**
-     * PostInfo详情
-     */
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    @ResponseBody
-    @ApiOperation(value = "PostInfo详情", notes = "PostInfo详情")
-    public Object test(String fundCode) {
-        List<PostInfo> postListByFundCode = postInfoService.getPostListByFundCode(fundCode);
-        postInfoService.batchSave(postListByFundCode);
-        return JsonUtil.createOkObject(postListByFundCode);
     }
 
     /**

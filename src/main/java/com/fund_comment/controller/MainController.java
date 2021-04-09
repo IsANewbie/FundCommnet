@@ -33,7 +33,7 @@ public class MainController {
     @ApiOperation(value = "获取PostInfo列表", notes = "获取PostInfo列表")
     public String list(Model model) {
         QueryWrapper<FundInfo> query = new QueryWrapper<>();
-        query.ge("status", 0);
+        query.in("status", 0, 1);
         List<FundInfo> list = fundInfoService.list(query);
         model.addAttribute("list", list);
         return "index";

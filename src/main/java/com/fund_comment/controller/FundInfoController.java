@@ -2,7 +2,6 @@ package com.fund_comment.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fund_comment.entity.FundInfo;
-import com.fund_comment.pojo.vo.Funds;
 import com.fund_comment.service.FundInfoService;
 import com.fund_comment.utils.JsonUtil;
 import io.swagger.annotations.Api;
@@ -37,7 +36,7 @@ public class FundInfoController {
     @ApiOperation(value = "获取FundInfo列表", notes = "获取FundInfo列表")
     public Object list(String condition) {
         QueryWrapper<FundInfo> query = new QueryWrapper<>();
-        query.ge("status", 0);
+        query.in("status", 0, 1);
         List<FundInfo> list = fundInfoService.list(query);
         return JsonUtil.createPageObject(list);
     }
@@ -53,13 +52,13 @@ public class FundInfoController {
         String name = split[1];
         FundInfo fundInfo = fundInfoService.getByFundCode(code);
         QueryWrapper<FundInfo> query = new QueryWrapper<>();
-        query.ge("status", 0);
+        query.in("status", 0, 1);
         List<FundInfo> list = fundInfoService.list(query);
         model.addAttribute("list", list);
         if (fundInfo != null) {
-            if ( fundInfo.getStatus() >= 0){
+            if (fundInfo.getStatus() >= 0) {
                 model.addAttribute("error", name + "（" + code + "）已存在任务列表中");
-            }else {
+            } else {
                 fundInfo.setStatus(1);
                 fundInfoService.updateById(fundInfo);
                 model.addAttribute("success", name + "（" + code + "）已添加至任务列表");
@@ -76,27 +75,6 @@ public class FundInfoController {
         return "index";
     }
 
-    /**
-     * 删除FundInfo
-     */
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    @ResponseBody
-    @ApiOperation(value = "删除FundInfo", notes = "删除FundInfo")
-    public Object delete(@RequestParam Integer fundInfoId) {
-        fundInfoService.removeById(fundInfoId);
-        return JsonUtil.createOkJson();
-    }
-
-    /**
-     * 修改FundInfo
-     */
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    @ResponseBody
-    @ApiOperation(value = "修改FundInfo", notes = "修改FundInfo")
-    public Object update(FundInfo fundInfo) {
-        fundInfoService.updateById(fundInfo);
-        return JsonUtil.createOkJson();
-    }
 
     /**
      * FundInfo详情
@@ -109,16 +87,6 @@ public class FundInfoController {
         return JsonUtil.createOkObject(obj);
     }
 
-    /**
-     * FundInfo详情
-     */
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
-    @ResponseBody
-    @ApiOperation(value = "FundInfo详情", notes = "FundInfo详情")
-    public Object search(String fundCode) {
-        List<Funds> fundSearchInfos = fundInfoService.search(fundCode);
-        return JsonUtil.createOkObject(fundSearchInfos);
-    }
 
     @RequestMapping(value = "/changeStatus", method = RequestMethod.GET)
     @ApiOperation(value = "FundInfo详情", notes = "FundInfo详情")
