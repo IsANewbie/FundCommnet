@@ -36,6 +36,7 @@ public class FundPostSpider {
         params.put("CToken", "eur6eqddjcjjk-je6unnekuak8arh-ef.2");
     }
 
+    // todo 分页配置，目前最多查询500条
     public List<JsonRootBean> getByFundCode(String fundCode) {
         Integer postCount = getPostCount(fundCode);
         log.info("基金代码：{}，帖子数共有：{}",fundCode, postCount);
@@ -80,4 +81,7 @@ public class FundPostSpider {
         String data = json.getString("Datas");
         return JSONObject.parseArray(data, FundSearchInfo.class);
     }
+
+    // // TODO: 2021/4/10 查询全网基金信息 天天基金
+
 }
