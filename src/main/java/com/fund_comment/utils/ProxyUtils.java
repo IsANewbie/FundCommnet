@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
  */
 public class ProxyUtils {
 
-    public static List<ProxyInfo> getUsefulIp(String targetUrl){
+    public static List<ProxyInfo> getUsefulIp(String targetUrl, String fundName){
         List<ProxyInfo> list = ip();
         System.out.println(list.size());
         List<ProxyInfo> usefulProxy =
-        list.stream().parallel().filter(o -> check(o, targetUrl)).collect(Collectors.toList());
+        list.stream().parallel().filter(o -> check(o, targetUrl,fundName)).collect(Collectors.toList());
         System.out.println(usefulProxy.size());
         return usefulProxy;
     }
@@ -48,7 +48,7 @@ public class ProxyUtils {
         return postPageInfos;
     }
 
-    private static boolean check(ProxyInfo proxyInfo, String targetUrl){
+    private static boolean check(ProxyInfo proxyInfo, String targetUrl,String fundName){
         String ip = proxyInfo.getIp();
         int port = proxyInfo.getPort();
         Random r = new Random();
@@ -81,9 +81,11 @@ public class ProxyUtils {
                     .header("referer",targetUrl)//这个来源记得换..
                     .get();
             System.out.println(ip+":"+port+"访问时间:"+(System.currentTimeMillis() -a) + "   访问结果: "+doc.text());
-            result = true;
+            if (doc.text().contains(fundName+"股吧")) {
+                result = true;
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("");
         }
         return result;
     }

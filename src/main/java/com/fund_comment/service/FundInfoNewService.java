@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-04-12
  */
 public interface FundInfoNewService extends IService<FundInfoNew> {
-
+    void savaList();
 }

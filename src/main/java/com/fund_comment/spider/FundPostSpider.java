@@ -1,7 +1,6 @@
 package com.fund_comment.spider;
 
 import com.alibaba.fastjson.JSONObject;
-import com.fund_comment.entity.FundInfo;
 import com.fund_comment.entity.FundInfoNew;
 import com.fund_comment.entity.PostInfoNew;
 import com.fund_comment.pojo.FundSearchInfo;
@@ -97,7 +96,7 @@ public class FundPostSpider {
     }
 
     // // TODO: 2021/4/10 查询全网基金信息 天天基金
-    public List<FundInfo> getAllFundInfo(){
+    public List<FundInfoNew> getAllFundInfo(){
         try {
             Connection.Response resp = Jsoup.connect("http://fund.eastmoney.com/allfund.html")
                     .timeout(60000)
@@ -108,16 +107,14 @@ public class FundPostSpider {
             InputStream in = new ByteArrayInputStream(resp.bodyAsBytes());
             Document document = Jsoup.parse(in,"GBK","http://fund.eastmoney.com/allfund.html");
             Elements select = document.select("#code_content");
-            System.out.println(select.size());
             Elements numBox = select.get(0).select(".num_box");
-            List<FundInfo> fundInfos = new ArrayList<>();
-            System.out.println(numBox.size());
-            numBox.stream().parallel().forEach(o -> {
-                Element currentNumFundList = o.select("ul.num_right").get(0);
+            List<FundInfoNew> fundInfos = new ArrayList<>();
+            numBox.stream().parallel().forEach(element -> {
+                Element currentNumFundList = element.select("ul.num_right").get(0);
                 Elements liList = currentNumFundList.select("li");
-                System.out.println(liList.size());
+                log.info("当前有基金{}支", liList.size());
                 for (int i = 1; i <= liList.size() ; i++) {
-                    FundInfo fund = new FundInfo();
+                    FundInfoNew fund = new FundInfoNew();
                     String fundInfoSelector = String.format("li:nth-child(%s) > div > a:nth-child(1)",i);
                     String fundInfo = currentNumFundList.select(fundInfoSelector).text();
                     if (StringUtils.isBlank(fundInfo) || !fundInfo.contains("）")){
@@ -126,13 +123,13 @@ public class FundPostSpider {
                     String[] split = fundInfo.split("）");
                     String fundCode = split[0];
                     String fundName = split[1];
-                    fund.setFundCode(fundCode);
+                    fund.setFundCode(fundCode.substring(1));
                     fund.setStatus(2);
                     fund.setFundName(fundName);
                     fundInfos.add(fund);
                 }
             });
-
+            log.info("共有{}支基金",fundInfos.size());
             return fundInfos;
 
         } catch (Exception e) {
@@ -165,60 +162,70 @@ public class FundPostSpider {
         String postListBaseUrl = "http://guba.eastmoney.com/list,of";
         String postListStartUrl = String.format("%s%s,f_1.html", postListBaseUrl, fundCode);
         try {
-            Document document = Jsoup.connect(postListStartUrl).get();
+            log.info("当前爬取地址:{}", postListStartUrl);
+            List<ProxyInfo> proxyInfoList = ProxyUtils.getUsefulIp(postListStartUrl, fundName);
+            log.info("可用代理数：{}", proxyInfoList.size());
+            int randomIndex = random.nextInt(proxyInfoList.size());
+            Document document = Jsoup.connect(postListStartUrl)
+                    .proxy(proxyInfoList.get(randomIndex).getIp(), proxyInfoList.get(randomIndex).getPort())
+                    .userAgent(ua[random.nextInt(ua.length)])
+                    .get();
+            if (!document.text().contains(fundName+"股吧")){
+                return new ArrayList<>();
+            }
             PostPageInfo pageInfo = getPageInfo(document);
-            List<ProxyInfo> proxyInfoList = ProxyUtils.getUsefulIp(postListBaseUrl);
+            log.info("当前基金: {},共有帖子：{}，共有页数：{}", fundName, pageInfo.getTotalCount(), pageInfo.getPageCount());
             for (int i = 1; i <= pageInfo.getPageCount(); i++) {
+                Thread.sleep(1000*8);
                 String currentPageUrl = String.format("%s%s,f_%s.html", postListBaseUrl, fundCode, i);
-                int randomIndex = random.nextInt(proxyInfoList.size());
-                ProxyInfo proxyInfo = proxyInfoList.get(randomIndex);
+//                randomIndex = random.nextInt(proxyInfoList.size());
+//                ProxyInfo proxyInfo = proxyInfoList.get(randomIndex);
+//                log.info("使用IP:{}", proxyInfo);
                 Document currentPage = Jsoup.connect(currentPageUrl)
-                        .timeout(5000)
-                        .proxy(proxyInfo.getIp(), proxyInfo.getPort())
-                        .ignoreContentType(true)
+//                        .timeout(5000)
+//                        .proxy(proxyInfo.getIp(), proxyInfo.getPort())
+//                        .ignoreContentType(true)
                         .userAgent(ua[random.nextInt(ua.length)])
                         .header("referer",String.format("%s%s,f_%s.html", postListBaseUrl, fundCode, i-1))
                         .get();
+                System.out.println("第"+i+"页");
+//                System.out.println(document.toString());
                 Element articleListNew = currentPage.getElementById("articlelistnew");
                 Elements postList = articleListNew.getElementsByClass("normal_post");
-                postList.forEach(o -> {
-                    String clickCount = o.select("span.l1").get(0).text();
-                    String commentCount = o.select("span.l2").get(0).text();
-                    String author = o.select("span.l4 font").get(0).text();
-                    String fundInfoUrl = String.format("%s%s", baseUrl, o.select("span.l3 a").get(0).attr("href"));
-                    try {
-                        Document fundInfo = Jsoup.connect(fundInfoUrl).get();
-                        String postTime = fundInfo.select("div.zwfbtime").get(0).text();
-                        String title = fundInfo.select("div#zwconttbt").get(0).text();
-                        String context = fundInfo.select("div.stockcodec").get(0).text();
-                        PostInfoNew postInfoNew = PostInfoNew.builder()
-                                .post(context)
-                                .publishTime(postTime)
-                                .fundName(fundName)
-                                .fundCode(fundCode)
-                                .clickCount(Long.parseLong(clickCount))
-                                .commentCount(Long.parseLong(commentCount))
-                                .writerName(author)
-                                .build();
-                        postInfoNewList.add(postInfoNew);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                for (int j = 0; j < postList.size(); j++) {
+                    Element element = postList.get(j);
+                    String clickCount = element.select("span.l1").size() > 0 ? element.select("span.l1").get(0).text():"";
+                    String commentCount = element.select("span.l2").size() > 0? element.select("span.l2").get(0).text():"";
+                    String postTime = element.select("span.l5").size() > 0? element.select("span.l5").get(0).text():"";
+                    String author = element.select("span.l4 font").size() > 0?element.select("span.l4 font").get(0).text():"";
+                    String context = element.select("span.l3 a").size()>0 ? element.select("span.l3 a").get(0).text():"";
+                    String fundInfoUrl = String.format("%s%s", baseUrl, element.select("span.l3 a").get(0).attr("href"));
+                    System.out.println(fundInfoUrl);
+                    PostInfoNew postInfoNew = PostInfoNew.builder()
+                            .post(context)
+                            .publishTime(postTime)
+                            .fundName(fundName)
+                            .fundCode(fundCode)
+                            .clickCount(clickCount)
+                            .commentCount(commentCount)
+                            .writerName(author)
+                            .build();
+                    postInfoNewList.add(postInfoNew);
+                }
+//                postList.forEach(element -> {
+//
+//                });
             }
             return postInfoNewList;
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return null;
     }
 
     private PostPageInfo getPageInfo(Document rootDocument) {
-
-        System.out.println(rootDocument.toString());
         Elements select = rootDocument.select("#articlelistnew > div.pager > span");
         String attr = select.attr("data-pager");
-        System.out.println(attr);
         String[] split = attr.split("\\|");
         int totalCount = Integer.parseInt(split[1]);
         int pageSize = Integer.parseInt(split[2]);

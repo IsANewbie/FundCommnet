@@ -59,11 +59,11 @@ public class PostInfoNew extends Model<PostInfoNew> {
     /**
      * 评论数
      */
-    private Long commentCount;
+    private String commentCount;
     /**
      * 点击数
      */
-    private Long clickCount;
+    private String clickCount;
     /**
      * 状态
      */
