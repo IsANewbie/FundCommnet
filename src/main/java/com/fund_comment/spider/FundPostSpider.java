@@ -2,6 +2,7 @@ package com.fund_comment.spider;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fund_comment.entity.FundInfo;
+import com.fund_comment.entity.FundInfoNew;
 import com.fund_comment.entity.PostInfoNew;
 import com.fund_comment.pojo.FundSearchInfo;
 import com.fund_comment.pojo.JsonRootBean;
@@ -126,6 +127,7 @@ public class FundPostSpider {
                     String fundCode = split[0];
                     String fundName = split[1];
                     fund.setFundCode(fundCode);
+                    fund.setStatus(2);
                     fund.setFundName(fundName);
                     fundInfos.add(fund);
                 }
@@ -139,8 +141,11 @@ public class FundPostSpider {
         return null;
     }
 
-    private List<PostInfoNew> getPostInfoNew(String fundCode) {
+    public List<PostInfoNew> getPostInfoNew(FundInfoNew fund) {
+        String fundCode = fund.getFundCode();
+        String fundName = fund.getFundName();
         Random random = new Random();
+        List<PostInfoNew> postInfoNewList = new ArrayList<>();
         String[] ua = {"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:46.0) Gecko/20100101 Firefox/46.0",
                 "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.87 Safari/537.36 OPR/37.0.2178.32",
                 "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534.57.2 (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2",
@@ -186,13 +191,22 @@ public class FundPostSpider {
                         String postTime = fundInfo.select("div.zwfbtime").get(0).text();
                         String title = fundInfo.select("div#zwconttbt").get(0).text();
                         String context = fundInfo.select("div.stockcodec").get(0).text();
-
+                        PostInfoNew postInfoNew = PostInfoNew.builder()
+                                .post(context)
+                                .publishTime(postTime)
+                                .fundName(fundName)
+                                .fundCode(fundCode)
+                                .clickCount(Long.parseLong(clickCount))
+                                .commentCount(Long.parseLong(commentCount))
+                                .writerName(author)
+                                .build();
+                        postInfoNewList.add(postInfoNew);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 });
             }
-            return null;
+            return postInfoNewList;
         } catch (IOException e) {
             e.printStackTrace();
         }

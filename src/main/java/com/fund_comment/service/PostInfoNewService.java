@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-04-12
  */
 public interface PostInfoNewService extends IService<PostInfoNew> {
-
+    void save();
 }

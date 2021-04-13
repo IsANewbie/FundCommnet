@@ -4,6 +4,7 @@ import com.fund_comment.entity.PostInfoNew;
 import com.fund_comment.mapper.PostInfoNewMapper;
 import com.fund_comment.service.PostInfoNewService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,4 +18,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class PostInfoNewServiceImpl extends ServiceImpl<PostInfoNewMapper, PostInfoNew> implements PostInfoNewService {
 
+    @Autowired
+
+
+    @Override
+    public void save() {
+
+    }
 }
