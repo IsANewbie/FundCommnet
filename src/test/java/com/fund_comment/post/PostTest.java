@@ -47,7 +47,11 @@ public class PostTest extends BaseTest {
     @Test
     public void exportBatch() {
         // // TODO: 2021/4/14 你用双数页，一次爬完手动输入  共12212/2000 7页
-        postInfoNewService.export(1, 2000);
+//        int[] j = {1,2,3,4,5,6,7};
+        for (int i = 1; i <= 18; i++) {
+            postInfoNewService.export(i, 500);
+        }
+
     }
 
     @Test

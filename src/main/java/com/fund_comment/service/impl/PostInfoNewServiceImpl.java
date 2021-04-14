@@ -1,6 +1,7 @@
 package com.fund_comment.service.impl;
 
 import com.alibaba.excel.EasyExcel;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -69,7 +70,9 @@ public class PostInfoNewServiceImpl extends ServiceImpl<PostInfoNewMapper, PostI
         // // TODO: 2021/4/14 改成你的盘 
         String excelPath = "H://fund_comments//new//";
         Page<FundInfoNew> page = new Page<>(pageNum, pageSize);
-        IPage<FundInfoNew> pages = fundInfoNewMapper.selectPage(page, null);
+        QueryWrapper<FundInfoNew> queryWrapper = new QueryWrapper<>();
+        queryWrapper.gt("id", 2533);
+        IPage<FundInfoNew> pages = fundInfoNewMapper.selectPage(page, queryWrapper);
         pages.getRecords().forEach(fundInfoNew -> {
             try {
                 log.info("当前拉取基金：{}", fundInfoNew);

@@ -1,7 +1,5 @@
 package com.fund_comment.task;
 
-import com.fund_comment.entity.FundInfo;
-import com.fund_comment.entity.PostInfo;
 import com.fund_comment.service.FundInfoService;
 import com.fund_comment.service.PostInfoService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 /**
  * @author zoubin
@@ -33,10 +30,10 @@ public class PostUpdateTask {
     }
 
     void doTask(){
-        List<FundInfo> list = fundInfoService.list();
-        list.stream().filter(o -> o.getStatus().equals(1)).forEach(o -> {
-            List<PostInfo> postListByFundCode = postInfoService.getPostListByFundCode(o.getFundCode());
-            postInfoService.batchSave(postListByFundCode);
-        });
+//        List<FundInfo> list = fundInfoService.list();
+//        list.stream().filter(o -> o.getStatus().equals(1)).forEach(o -> {
+//            List<PostInfo> postListByFundCode = postInfoService.getPostListByFundCode(o.getFundCode());
+//            postInfoService.batchSave(postListByFundCode);
+//        });
     }
 }
