@@ -40,7 +40,7 @@ public class PostInfoServiceImpl extends ServiceImpl<PostInfoMapper, PostInfo> i
 
     @Override
     public List<PostInfo> getPostListByFundCode(String fundCode) {
-        List<JsonRootBean> posts = postSpider.getByFundCode(fundCode);
+        List<JsonRootBean> posts = postSpider.getByFundCode(fundCode, "0");
         log.info("基金代码：{}，帖子数目前爬取到：{}", fundCode, posts.size());
         PostInfo lastPost = getLastPost(fundCode);
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

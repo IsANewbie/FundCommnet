@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface PostInfoNewService extends IService<PostInfoNew> {
     void save();
+
+    void export(int pageNum, int pageSize);
 }

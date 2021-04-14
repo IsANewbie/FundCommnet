@@ -50,15 +50,30 @@ public class FundPostSpider {
     }
 
     // todo 分页配置，目前最多查询500条
-    public List<JsonRootBean> getByFundCode(String fundCode) {
-        Integer postCount = getPostCount(fundCode);
-        log.info("基金代码：{}，帖子数共有：{}",fundCode, postCount);
+    public List<JsonRootBean> getByFundCodeStartInfo(String fundCode) {
+//        Integer postCount = getPostCount(fundCode);
+//        log.info("基金代码：{}，帖子数共有：{}",fundCode, postCount);
         Map<String, Object> params = new HashMap<>(16);
         initCommonParams(params);
         params.put("fundCode", fundCode);
         params.put("TimePoint", "0");
-        params.put("pageSize", postCount);
-        params.put("sort", "0");
+        params.put("pageSize", 500);
+        params.put("sort", "1");
+        JSONObject json = HttpsUtils.doPost(GET_FUND_POST_PAGE, params);
+        String data = json.getString("Data");
+        List<JsonRootBean> posts = JSONObject.parseArray(data, JsonRootBean.class);
+
+        return posts;
+    }
+
+    // todo 分页配置，目前最多查询500条
+    public List<JsonRootBean> getByFundCode(String fundCode, String lastTimePoint) {
+        Map<String, Object> params = new HashMap<>(16);
+        initCommonParams(params);
+        params.put("fundCode", fundCode);
+        params.put("TimePoint", lastTimePoint);
+        params.put("pageSize", 500);
+        params.put("sort", "1");
         JSONObject json = HttpsUtils.doPost(GET_FUND_POST_PAGE, params);
         String data = json.getString("Data");
         List<JsonRootBean> posts = JSONObject.parseArray(data, JsonRootBean.class);

@@ -29,7 +29,7 @@ public class CommentInfoServiceImpl extends ServiceImpl<CommentInfoMapper, Comme
 
     @Override
     public List<CommentInfo> getComments(String fundCode) {
-        List<JsonRootBean> byFundCode = postSpider.getByFundCode(fundCode);
+        List<JsonRootBean> byFundCode = postSpider.getByFundCode(fundCode, "0");
         List<CommentInfo> commentInfos = new ArrayList<>();
         byFundCode.forEach(o -> {
             String postId = o.getNewsId();
