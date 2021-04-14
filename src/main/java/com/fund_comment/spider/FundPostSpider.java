@@ -38,11 +38,11 @@ public class FundPostSpider {
     public void initCommonParams(Map<String, Object> params) {
         params.put("uid", "8118305875161670");
         params.put("product", "EFund");
-        params.put("appVersion", "6.4.0");
-        params.put("ServerVersion", "6.4.0");
+//        params.put("appVersion", "6.4.0");
+//        params.put("ServerVersion", "6.4.0");
         params.put("UserId", "e5392d1889734e9d8b7dfaf29419d56d");
         params.put("PassportID", "8118305875161670");
-        params.put("plat", "Android");
+        params.put("plat", "Web");
         params.put("UToken", "j1rrjfc8jceuu-urcucacakfd-188j88x8exuu5b.2");
         params.put("version", "6.4.0");
         params.put("deviceid", "725dbd0e85055ad52109fbff07ebab09%7C%7Ciemi_tluafed_me");
@@ -57,7 +57,7 @@ public class FundPostSpider {
         initCommonParams(params);
         params.put("fundCode", fundCode);
         params.put("TimePoint", "0");
-        params.put("pageSize", 500);
+        params.put("pageSize", 5000);
         params.put("sort", "1");
         JSONObject json = HttpsUtils.doPost(GET_FUND_POST_PAGE, params);
         String data = json.getString("Data");
@@ -72,7 +72,7 @@ public class FundPostSpider {
         initCommonParams(params);
         params.put("fundCode", fundCode);
         params.put("TimePoint", lastTimePoint);
-        params.put("pageSize", 500);
+        params.put("pageSize", 5000);
         params.put("sort", "1");
         JSONObject json = HttpsUtils.doPost(GET_FUND_POST_PAGE, params);
         String data = json.getString("Data");

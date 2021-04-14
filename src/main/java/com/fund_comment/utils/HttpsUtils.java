@@ -171,6 +171,9 @@ public class HttpsUtils {
         } else {
             httpClient = HttpClients.createDefault();
         }
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(30000)
+                .setConnectionRequestTimeout(30000).setSocketTimeout(30000).build();
+
         String httpStr = null;
         HttpPost httpPost = new HttpPost(apiUrl);
         CloseableHttpResponse response = null;
