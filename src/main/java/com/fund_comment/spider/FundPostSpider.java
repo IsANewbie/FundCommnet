@@ -33,6 +33,7 @@ public class FundPostSpider {
 
     private static final String SEARCH_FUND = "https://appsuggest.1234567.com.cn/FundMSearchApi/FundSearch46Funds";
 
+
     private Map<String, List<ProxyInfo>> proxyInfosMap;
 
     public void initCommonParams(Map<String, Object> params) {
@@ -51,8 +52,6 @@ public class FundPostSpider {
 
     // todo 分页配置，目前最多查询500条
     public List<JsonRootBean> getByFundCodeStartInfo(String fundCode) {
-//        Integer postCount = getPostCount(fundCode);
-//        log.info("基金代码：{}，帖子数共有：{}",fundCode, postCount);
         Map<String, Object> params = new HashMap<>(16);
         initCommonParams(params);
         params.put("fundCode", fundCode);

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fund_comment.mapper.FundEstimateNavInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.fund_comment.entity.FundEstimateNavInfo">
+        <id column="id" property="id" />
+        <result column="fund_code" property="fundCode" />
+        <result column="fund_name" property="fundName" />
+        <result column="estimate_date" property="estimateDate" />
+        <result column="estimate_nav" property="estimateNav" />
+        <result column="estimate_nav_rise" property="estimateNavRise" />
+        <result column="nav" property="nav" />
+        <result column="nav_rise" property="navRise" />
+        <result column="is_buy" property="isBuy" />
+        <result column="is_last_trade_day" property="isLastTradeDay" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, fund_code, fund_name, estimate_date, estimate_nav, estimate_nav_rise, nav, nav_rise, is_buy, is_last_trade_day, update_time, create_time
+    </sql>
+
+</mapper>

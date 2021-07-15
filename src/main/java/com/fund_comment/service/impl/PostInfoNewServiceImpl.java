@@ -71,14 +71,16 @@ public class PostInfoNewServiceImpl extends ServiceImpl<PostInfoNewMapper, PostI
         String excelPath = "H://fund_comments//new//";
         Page<FundInfoNew> page = new Page<>(pageNum, pageSize);
         QueryWrapper<FundInfoNew> queryWrapper = new QueryWrapper<>();
-        queryWrapper.gt("id", 2533);
+        queryWrapper.gt("id", 11282);
         IPage<FundInfoNew> pages = fundInfoNewMapper.selectPage(page, queryWrapper);
         pages.getRecords().forEach(fundInfoNew -> {
             try {
                 log.info("当前拉取基金：{}", fundInfoNew);
-                Thread.sleep(5000);
                 List<JsonRootBean> byFundCodeStartInfo = fundPostSpider.getByFundCodeStartInfo(fundInfoNew.getFundCode());
                 String timePointStr = byFundCodeStartInfo.get(byFundCodeStartInfo.size() - 1).getTimePointStr();
+                if (timePointStr.equals("0")) {
+                    timePointStr = byFundCodeStartInfo.get(byFundCodeStartInfo.size() - 2).getTimePointStr();
+                }
                 boolean fetchPost = true;
 //                int i = 2;
                 while (fetchPost) {

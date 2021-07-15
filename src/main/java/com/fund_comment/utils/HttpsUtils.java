@@ -25,8 +25,9 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,7 +105,7 @@ public class HttpsUtils {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
                 InputStream instream = entity.getContent();
-                result = IOUtils.toString(instream, "UTF-8");
+                result = IOUtils.toString(instream, StandardCharsets.UTF_8);
             }
         } catch (IOException e) {
             log.error("doGet Map error", e, e);
@@ -185,7 +186,7 @@ public class HttpsUtils {
                 NameValuePair pair = new BasicNameValuePair(entry.getKey(), entry.getValue().toString());
                 pairList.add(pair);
             }
-            httpPost.setEntity(new UrlEncodedFormEntity(pairList, Charset.forName("UTF-8")));
+            httpPost.setEntity(new UrlEncodedFormEntity(pairList, StandardCharsets.UTF_8));
             response = httpClient.execute(httpPost);
             HttpEntity entity = response.getEntity();
             httpStr = EntityUtils.toString(entity, "UTF-8");
